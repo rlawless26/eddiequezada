@@ -659,24 +659,24 @@
       <div class="minifig-layout">
         <div class="minifig-stage">
           <svg id="minifig-svg" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
-            <!-- Hair (drawn first, behind head) -->
-            <g id="hair-group"></g>
+            <!-- Neck (behind head) -->
+            <rect x="88" y="100" width="24" height="10" fill="#C9A100" stroke="#000" stroke-width="2"/>
             <!-- Head -->
             <rect x="65" y="40" width="70" height="65" rx="8" fill="#FFCD00" stroke="#000" stroke-width="2"/>
             <!-- Face -->
             <g id="face-group"></g>
-            <!-- Neck -->
-            <rect x="88" y="100" width="24" height="10" fill="#C9A100" stroke="#000" stroke-width="2"/>
+            <!-- Hair / Hat (on top of head) -->
+            <g id="hair-group"></g>
             <!-- Torso -->
             <path id="torso" d="M50 110 L150 110 L160 195 L40 195 Z" fill="var(--red)" stroke="#000" stroke-width="2"/>
             <!-- Arms -->
             <path id="arm-left" d="M50 115 L32 180 L48 192 L68 130 Z" fill="var(--red)" stroke="#000" stroke-width="2"/>
             <path id="arm-right" d="M150 115 L168 180 L152 192 L132 130 Z" fill="var(--red)" stroke="#000" stroke-width="2"/>
-            <!-- Hands -->
-            <circle cx="40" cy="195" r="11" fill="#FFCD00" stroke="#000" stroke-width="2"/>
-            <circle cx="160" cy="195" r="11" fill="#FFCD00" stroke="#000" stroke-width="2"/>
             <!-- Belt -->
             <rect x="40" y="190" width="120" height="8" fill="#333" stroke="#000" stroke-width="2"/>
+            <!-- Hands (in front) -->
+            <circle cx="40" cy="195" r="11" fill="#FFCD00" stroke="#000" stroke-width="2"/>
+            <circle cx="160" cy="195" r="11" fill="#FFCD00" stroke="#000" stroke-width="2"/>
             <!-- Legs -->
             <rect id="leg-left" x="62" y="198" width="36" height="70" fill="var(--blue)" stroke="#000" stroke-width="2"/>
             <rect id="leg-right" x="102" y="198" width="36" height="70" fill="var(--blue)" stroke="#000" stroke-width="2"/>
@@ -733,37 +733,6 @@
           <p>Tap or press SPACE to drop the brick.<br>Line it up perfectly to keep it full size!</p>
           <button class="big-btn" id="start-btn">▶ START</button>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ FAVORITE THEMES ============ -->
-  <section class="zone">
-    <h2 class="zone-title">Favorite Themes</h2>
-    <div class="themes-grid">
-      <div class="theme-card" style="background: #FFE5E5;">
-        <span class="theme-icon">⚔️</span>
-        <div class="theme-name">Star Wars</div>
-      </div>
-      <div class="theme-card" style="background: #E5F0FF;">
-        <span class="theme-icon">🥷</span>
-        <div class="theme-name">Ninjago</div>
-      </div>
-      <div class="theme-card" style="background: #E5FFE9;">
-        <span class="theme-icon">🏙️</span>
-        <div class="theme-name">City</div>
-      </div>
-      <div class="theme-card" style="background: #FFF4D6;">
-        <span class="theme-icon">⚙️</span>
-        <div class="theme-name">Technic</div>
-      </div>
-      <div class="theme-card" style="background: #F0E5FF;">
-        <span class="theme-icon">🦸</span>
-        <div class="theme-name">Super Heroes</div>
-      </div>
-      <div class="theme-card" style="background: #FFE5F4;">
-        <span class="theme-icon">🚂</span>
-        <div class="theme-name">Trains</div>
       </div>
     </div>
   </section>
@@ -985,16 +954,16 @@
   function minifigPreviewSVG(s) {
     return `
       <svg viewBox="0 0 200 285" xmlns="http://www.w3.org/2000/svg">
-        ${HAIR_STYLES[s.hair] || ''}
+        <rect x="88" y="100" width="24" height="10" fill="#C9A100" stroke="#000" stroke-width="2"/>
         <rect x="65" y="40" width="70" height="65" rx="8" fill="#FFCD00" stroke="#000" stroke-width="2"/>
         ${FACES[s.face] || ''}
-        <rect x="88" y="100" width="24" height="10" fill="#C9A100" stroke="#000" stroke-width="2"/>
+        ${HAIR_STYLES[s.hair] || ''}
         <path d="M50 110 L150 110 L160 195 L40 195 Z" fill="${COLORS[s.torso]}" stroke="#000" stroke-width="2"/>
         <path d="M50 115 L32 180 L48 192 L68 130 Z" fill="${COLORS[s.torso]}" stroke="#000" stroke-width="2"/>
         <path d="M150 115 L168 180 L152 192 L132 130 Z" fill="${COLORS[s.torso]}" stroke="#000" stroke-width="2"/>
+        <rect x="40" y="190" width="120" height="8" fill="#333" stroke="#000" stroke-width="2"/>
         <circle cx="40" cy="195" r="11" fill="#FFCD00" stroke="#000" stroke-width="2"/>
         <circle cx="160" cy="195" r="11" fill="#FFCD00" stroke="#000" stroke-width="2"/>
-        <rect x="40" y="190" width="120" height="8" fill="#333" stroke="#000" stroke-width="2"/>
         <rect x="62" y="198" width="36" height="70" fill="${COLORS[s.legs]}" stroke="#000" stroke-width="2"/>
         <rect x="102" y="198" width="36" height="70" fill="${COLORS[s.legs]}" stroke="#000" stroke-width="2"/>
         <rect x="58" y="265" width="40" height="10" rx="3" fill="#000"/>
@@ -1129,7 +1098,7 @@
       width: top.width,
       color: STACK_COLORS[stack.length % STACK_COLORS.length],
       dir,
-      speed: 2.2 + Math.min(stack.length * 0.12, 4)
+      speed: 1.4 + Math.min(stack.length * 0.07, 2.6)
     };
   }
 
