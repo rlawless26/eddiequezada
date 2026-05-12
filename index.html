@@ -473,6 +473,29 @@
     touch-action: manipulation;
   }
 
+  /* ----- BRICK CATCHER GAME ----- */
+  #catcher-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    border: 4px solid var(--green);
+    border-radius: 16px;
+    overflow: hidden;
+    aspect-ratio: 400 / 520;
+  }
+
+  #catcher-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #2a4d7a 0%, #1a2e4a 100%);
+    touch-action: none;
+    cursor: pointer;
+  }
+
+  #catcher-lives { letter-spacing: 0.05em; }
+
   .game-message {
     position: absolute;
     inset: 0;
@@ -703,9 +726,9 @@
             <path id="arm-right" d="M150 115 L168 180 L152 192 L132 130 Z" fill="var(--red)" stroke="#000" stroke-width="2"/>
             <!-- Belt -->
             <rect x="40" y="190" width="120" height="8" fill="#333" stroke="#000" stroke-width="2"/>
-            <!-- Hands (in front) -->
-            <circle cx="40" cy="195" r="11" fill="#FFCD00" stroke="#000" stroke-width="2"/>
-            <circle cx="160" cy="195" r="11" fill="#FFCD00" stroke="#000" stroke-width="2"/>
+            <!-- Hands (LEGO C-clip, in front) -->
+            <path d="M 45 186 A 11 11 0 1 1 35 186 L 38 192 A 4 4 0 1 0 42 192 Z" fill="#FFCD00" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M 165 186 A 11 11 0 1 1 155 186 L 158 192 A 4 4 0 1 0 162 192 Z" fill="#FFCD00" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
             <!-- Legs -->
             <rect id="leg-left" x="62" y="198" width="36" height="70" fill="var(--blue)" stroke="#000" stroke-width="2"/>
             <rect id="leg-right" x="102" y="198" width="36" height="70" fill="var(--blue)" stroke="#000" stroke-width="2"/>
@@ -727,6 +750,10 @@
           <div class="control-group">
             <label>💇 Hair Style</label>
             <div class="control-buttons" id="hair-controls"></div>
+          </div>
+          <div class="control-group">
+            <label>🎨 Hair Color</label>
+            <div class="control-buttons" id="haircolor-controls"></div>
           </div>
           <div class="control-group">
             <label>😀 Face</label>
@@ -763,6 +790,27 @@
           <button class="big-btn" id="start-btn">▶ START</button>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ============ BRICK CATCHER GAME ============ -->
+  <section class="zone">
+    <h2 class="zone-title" style="color: var(--green);">Brick Catcher</h2>
+    <div class="game-zone">
+      <div class="game-hud">
+        <div class="hud-item">SCORE <span id="catcher-score">0</span></div>
+        <div class="hud-item">LIVES <span id="catcher-lives">❤️❤️❤️</span></div>
+        <div class="hud-item">BEST <span id="catcher-best">0</span></div>
+      </div>
+      <div id="catcher-wrap">
+        <canvas id="catcher-canvas" width="400" height="520"></canvas>
+        <div class="game-message" id="catcher-message">
+          <h3>BRICK CATCHER!</h3>
+          <p>Catch the falling bricks with your minifig.<br>Dodge the 🔥 lava ones! You have 3 lives.</p>
+          <button class="big-btn" id="catcher-start-btn">▶ START</button>
+        </div>
+      </div>
+      <p style="text-align: center; margin-top: 1rem; color: rgba(255,255,255,0.7); font-size: 0.9rem;">Move with ← → keys, mouse, or touch</p>
     </div>
   </section>
 
@@ -852,13 +900,24 @@
     black: '#1A1A1A', white: '#FFFFFF'
   };
 
+  const HAIR_COLORS = {
+    brown:  '#4A2C1A',
+    black:  '#1A1A1A',
+    blonde: '#FFD700',
+    red:    '#D4421E',
+    gray:   '#9BA3A8',
+    green:  '#00852B',
+    blue:   '#0058A3',
+    purple: '#7B2CBF'
+  };
+
   const HAIR_STYLES = {
-    none: '',
-    short: '<path d="M55 50 Q55 25 100 22 Q145 25 145 50 L140 55 Q130 35 100 35 Q70 35 60 55 Z" fill="#4A2C1A" stroke="#000" stroke-width="2"/>',
-    spiky: '<path d="M55 50 L60 25 L72 40 L80 20 L92 38 L100 18 L108 38 L120 20 L128 40 L140 25 L145 50 Q130 38 100 38 Q70 38 55 50 Z" fill="#D4421E" stroke="#000" stroke-width="2"/>',
-    long: '<path d="M52 125 L52 50 Q52 22 100 22 Q148 22 148 50 L148 125 L132 125 L132 55 Q120 42 100 42 Q80 42 68 55 L68 125 Z" fill="#FFD700" stroke="#000" stroke-width="2"/>',
-    hat: '<path d="M50 55 L150 55 L145 35 L55 35 Z" fill="#00852B" stroke="#000" stroke-width="2"/><rect x="40" y="50" width="120" height="10" fill="#00852B" stroke="#000" stroke-width="2"/><circle cx="100" cy="28" r="6" fill="#FFCD00" stroke="#000" stroke-width="2"/>',
-    cap: '<path d="M58 48 Q58 18 100 18 Q142 18 142 48 Z" fill="#0058A3" stroke="#000" stroke-width="2"/><ellipse cx="100" cy="50" rx="52" ry="5" fill="#0058A3" stroke="#000" stroke-width="2"/>'
+    none:  () => '',
+    short: c => `<path d="M63 48 Q63 22 100 22 Q137 22 137 48 L135 45 Q100 50 65 45 Z" fill="${c}" stroke="#000" stroke-width="2"/>`,
+    spiky: c => `<path d="M65 45 L72 28 L82 42 L92 22 L100 40 L108 22 L118 42 L128 28 L135 45 Q100 50 65 45 Z" fill="${c}" stroke="#000" stroke-width="2"/>`,
+    long:  c => `<path d="M52 125 L52 50 Q52 22 100 22 Q148 22 148 50 L148 125 L132 125 L132 55 Q120 42 100 42 Q80 42 68 55 L68 125 Z" fill="${c}" stroke="#000" stroke-width="2"/>`,
+    hat:   c => `<path d="M50 55 L150 55 L145 35 L55 35 Z" fill="${c}" stroke="#000" stroke-width="2"/><rect x="40" y="50" width="120" height="10" fill="${c}" stroke="#000" stroke-width="2"/><circle cx="100" cy="28" r="6" fill="#FFCD00" stroke="#000" stroke-width="2"/>`,
+    cap:   c => `<path d="M58 48 Q58 18 100 18 Q142 18 142 48 Z" fill="${c}" stroke="#000" stroke-width="2"/><ellipse cx="100" cy="50" rx="52" ry="5" fill="${c}" stroke="#000" stroke-width="2"/>`
   };
 
   const FACES = {
@@ -874,6 +933,7 @@
     torso: 'red',
     legs: 'blue',
     hair: 'short',
+    hairColor: 'brown',
     face: 'happy'
   };
 
@@ -883,7 +943,7 @@
     document.getElementById('arm-right').setAttribute('fill', COLORS[state.torso]);
     document.getElementById('leg-left').setAttribute('fill', COLORS[state.legs]);
     document.getElementById('leg-right').setAttribute('fill', COLORS[state.legs]);
-    document.getElementById('hair-group').innerHTML = HAIR_STYLES[state.hair];
+    document.getElementById('hair-group').innerHTML = HAIR_STYLES[state.hair](HAIR_COLORS[state.hairColor] || HAIR_COLORS.brown);
     document.getElementById('face-group').innerHTML = FACES[state.face];
     updateActive();
     localStorage.setItem('eddie-minifig', JSON.stringify(state));
@@ -893,6 +953,7 @@
     document.querySelectorAll('[data-torso]').forEach(b => b.classList.toggle('active', b.dataset.torso === state.torso));
     document.querySelectorAll('[data-legs]').forEach(b => b.classList.toggle('active', b.dataset.legs === state.legs));
     document.querySelectorAll('[data-hair]').forEach(b => b.classList.toggle('active', b.dataset.hair === state.hair));
+    document.querySelectorAll('[data-haircolor]').forEach(b => b.classList.toggle('active', b.dataset.haircolor === state.hairColor));
     document.querySelectorAll('[data-face]').forEach(b => b.classList.toggle('active', b.dataset.face === state.face));
   }
 
@@ -933,6 +994,17 @@
     document.getElementById('hair-controls').appendChild(btn);
   });
 
+  const hairColorKeys = Object.keys(HAIR_COLORS);
+  hairColorKeys.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'swatch';
+    btn.style.background = HAIR_COLORS[c];
+    btn.dataset.haircolor = c;
+    btn.title = c;
+    btn.addEventListener('click', () => { state.hairColor = c; render(); });
+    document.getElementById('haircolor-controls').appendChild(btn);
+  });
+
   const faceOptions = [
     { key: 'happy', label: '😀' },
     { key: 'cool', label: '😎' },
@@ -955,6 +1027,7 @@
     state.torso = torsoColors[Math.floor(Math.random() * torsoColors.length)];
     state.legs = legsColors[Math.floor(Math.random() * legsColors.length)];
     state.hair = hairOptions[Math.floor(Math.random() * hairOptions.length)].key;
+    state.hairColor = hairColorKeys[Math.floor(Math.random() * hairColorKeys.length)];
     state.face = faceOptions[Math.floor(Math.random() * faceOptions.length)].key;
     render();
   });
@@ -986,13 +1059,13 @@
         <rect x="88" y="100" width="24" height="10" fill="#C9A100" stroke="#000" stroke-width="2"/>
         <rect x="65" y="40" width="70" height="65" rx="8" fill="#FFCD00" stroke="#000" stroke-width="2"/>
         ${FACES[s.face] || ''}
-        ${HAIR_STYLES[s.hair] || ''}
+        ${HAIR_STYLES[s.hair] ? HAIR_STYLES[s.hair](HAIR_COLORS[s.hairColor] || HAIR_COLORS.brown) : ''}
         <path d="M50 110 L150 110 L160 195 L40 195 Z" fill="${COLORS[s.torso]}" stroke="#000" stroke-width="2"/>
         <path d="M50 115 L32 180 L48 192 L68 130 Z" fill="${COLORS[s.torso]}" stroke="#000" stroke-width="2"/>
         <path d="M150 115 L168 180 L152 192 L132 130 Z" fill="${COLORS[s.torso]}" stroke="#000" stroke-width="2"/>
         <rect x="40" y="190" width="120" height="8" fill="#333" stroke="#000" stroke-width="2"/>
-        <circle cx="40" cy="195" r="11" fill="#FFCD00" stroke="#000" stroke-width="2"/>
-        <circle cx="160" cy="195" r="11" fill="#FFCD00" stroke="#000" stroke-width="2"/>
+        <path d="M 45 186 A 11 11 0 1 1 35 186 L 38 192 A 4 4 0 1 0 42 192 Z" fill="#FFCD00" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M 165 186 A 11 11 0 1 1 155 186 L 158 192 A 4 4 0 1 0 162 192 Z" fill="#FFCD00" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
         <rect x="62" y="198" width="36" height="70" fill="${COLORS[s.legs]}" stroke="#000" stroke-width="2"/>
         <rect x="102" y="198" width="36" height="70" fill="${COLORS[s.legs]}" stroke="#000" stroke-width="2"/>
         <rect x="58" y="265" width="40" height="10" rx="3" fill="#000"/>
@@ -1234,6 +1307,299 @@
   document.addEventListener('keydown', e => {
     if (e.code === 'Space' && stackerRunning) { e.preventDefault(); dropBrick(); }
   });
+
+  /* ============ BRICK CATCHER GAME ============ */
+  const cCanvas = document.getElementById('catcher-canvas');
+  const cCtx = cCanvas.getContext('2d');
+  const CW = cCanvas.width;
+  const CH = cCanvas.height;
+  const cScoreEl = document.getElementById('catcher-score');
+  const cLivesEl = document.getElementById('catcher-lives');
+  const cBestEl = document.getElementById('catcher-best');
+  const catcherMessage = document.getElementById('catcher-message');
+  const catcherStartBtn = document.getElementById('catcher-start-btn');
+
+  const CATCHER_GROUND = CH - 16;
+  const CATCHER_IMG_W = 80;
+  const CATCHER_IMG_H = CATCHER_IMG_W * (285 / 200); // ~114
+  const CATCHER_Y_TOP = CATCHER_GROUND - CATCHER_IMG_H + 8; // image top so feet meet ground
+  const CATCH_ZONE_HALF = 30;
+
+  let catcherX = CW / 2;
+  let catcherTargetX = CW / 2;
+  let fallingBricks = [];
+  let catcherScore = 0;
+  let catcherLives = 3;
+  let catcherRunning = false;
+  let catcherImage = null;
+  let catcherImgUrl = null;
+  let catcherStartTime = 0;
+  let lastCatcherSpawn = 0;
+  let catcherFlash = 0;
+  let leftDown = false, rightDown = false;
+  let bestCatcher = parseInt(localStorage.getItem('eddie-catcher-best') || '0', 10);
+  cBestEl.textContent = bestCatcher;
+
+  function rebuildCatcherImage() {
+    if (catcherImgUrl) URL.revokeObjectURL(catcherImgUrl);
+    const svgString = `<?xml version="1.0" encoding="UTF-8"?>` + minifigPreviewSVG(state);
+    const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    catcherImgUrl = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => { catcherImage = img; };
+    img.src = catcherImgUrl;
+  }
+  rebuildCatcherImage();
+
+  function startCatcher() {
+    rebuildCatcherImage();
+    fallingBricks = [];
+    catcherScore = 0;
+    catcherLives = 3;
+    catcherX = catcherTargetX = CW / 2;
+    catcherStartTime = performance.now();
+    lastCatcherSpawn = performance.now();
+    catcherFlash = 0;
+    catcherRunning = true;
+    catcherMessage.style.display = 'none';
+    updateCatcherHUD();
+  }
+
+  function spawnCatcherBrick() {
+    const elapsed = (performance.now() - catcherStartTime) / 1000;
+    const lavaRate = Math.min(0.12 + elapsed * 0.004, 0.28);
+    let type;
+    if (Math.random() < lavaRate) {
+      type = { color: 'lava', points: -1 };
+    } else {
+      const r = Math.random();
+      if (r < 0.5) type = { color: ['#E3000B','#0058A3','#00852B'][Math.floor(Math.random() * 3)], points: 1 };
+      else if (r < 0.75) type = { color: '#FF7F00', points: 2 };
+      else if (r < 0.88) type = { color: '#7B2CBF', points: 3 };
+      else if (r < 0.97) type = { color: '#FFCD00', points: 5 };
+      else type = { color: '#FF1493', points: 10 };
+    }
+    const w = 54;
+    fallingBricks.push({
+      x: 20 + Math.random() * (CW - 40 - w),
+      y: -40,
+      w,
+      h: 32,
+      type,
+      vy: 1.8 + Math.min(elapsed * 0.06, 2.6) + Math.random() * 0.5
+    });
+  }
+
+  function drawCatcherBrick(b) {
+    if (b.type.color === 'lava') {
+      const pulse = 0.7 + 0.3 * Math.sin(performance.now() / 120);
+      cCtx.fillStyle = `rgb(${Math.round(220 * pulse + 35)}, ${Math.round(60 * pulse + 30)}, 0)`;
+      cCtx.strokeStyle = '#3a1500';
+      cCtx.lineWidth = 2;
+      roundRect(cCtx, b.x, b.y, b.w, b.h, 5);
+      cCtx.fill();
+      cCtx.stroke();
+      cCtx.fillStyle = `rgba(255, 220, 80, ${0.4 + 0.3 * pulse})`;
+      roundRect(cCtx, b.x + 4, b.y + 4, b.w - 8, b.h - 8, 3);
+      cCtx.fill();
+      cCtx.font = 'bold 22px sans-serif';
+      cCtx.textAlign = 'center';
+      cCtx.textBaseline = 'middle';
+      cCtx.fillText('🔥', b.x + b.w / 2, b.y + b.h / 2 + 1);
+      return;
+    }
+    cCtx.fillStyle = b.type.color;
+    cCtx.strokeStyle = '#000';
+    cCtx.lineWidth = 2;
+    roundRect(cCtx, b.x, b.y, b.w, b.h, 4);
+    cCtx.fill();
+    cCtx.stroke();
+    cCtx.fillStyle = 'rgba(255,255,255,0.3)';
+    cCtx.fillRect(b.x + 2, b.y + 2, b.w - 4, 5);
+    cCtx.fillStyle = 'rgba(0,0,0,0.28)';
+    cCtx.fillRect(b.x + 2, b.y + b.h - 7, b.w - 4, 5);
+    const studs = 2;
+    cCtx.fillStyle = b.type.color;
+    for (let i = 0; i < studs; i++) {
+      const sx = b.x + (i + 0.5) * (b.w / studs);
+      cCtx.beginPath();
+      cCtx.arc(sx, b.y - 1, 5, 0, Math.PI * 2);
+      cCtx.fill();
+      cCtx.stroke();
+    }
+  }
+
+  function popText(x, y, text, color) {
+    fallingBricks.push({
+      _pop: true,
+      x, y, text, color,
+      life: 1,
+      vy: -1.2
+    });
+  }
+
+  function updateCatcherHUD() {
+    cScoreEl.textContent = catcherScore;
+    cBestEl.textContent = bestCatcher;
+    const filled = Math.max(0, catcherLives);
+    cLivesEl.textContent = '❤️'.repeat(filled) + '🖤'.repeat(3 - filled);
+  }
+
+  function endCatcher() {
+    catcherRunning = false;
+    const isNew = catcherScore > bestCatcher;
+    if (isNew) {
+      bestCatcher = catcherScore;
+      localStorage.setItem('eddie-catcher-best', bestCatcher);
+    }
+    setTimeout(() => {
+      catcherMessage.querySelector('h3').textContent = isNew ? '🏆 NEW BEST!' : 'GAME OVER';
+      catcherMessage.querySelector('p').innerHTML = `You caught <strong>${catcherScore}</strong> point${catcherScore === 1 ? '' : 's'}!`;
+      catcherStartBtn.textContent = '▶ PLAY AGAIN';
+      catcherMessage.style.display = 'flex';
+      updateCatcherHUD();
+    }, 700);
+  }
+
+  function catcherLoop() {
+    requestAnimationFrame(catcherLoop);
+    // background
+    const grad = cCtx.createLinearGradient(0, 0, 0, CH);
+    grad.addColorStop(0, '#2a4d7a');
+    grad.addColorStop(1, '#1a2e4a');
+    cCtx.fillStyle = grad;
+    cCtx.fillRect(0, 0, CW, CH);
+    // dot pattern
+    cCtx.fillStyle = 'rgba(255,255,255,0.05)';
+    for (let y = 15; y < CH; y += 30) {
+      for (let x = 15; x < CW; x += 30) cCtx.fillRect(x, y, 2, 2);
+    }
+    // ground
+    cCtx.fillStyle = '#1f6a2a';
+    cCtx.fillRect(0, CATCHER_GROUND, CW, CH - CATCHER_GROUND);
+    cCtx.fillStyle = 'rgba(0,0,0,0.3)';
+    for (let x = 15; x < CW; x += 30) {
+      cCtx.beginPath();
+      cCtx.arc(x, CATCHER_GROUND + 8, 4, 0, Math.PI * 2);
+      cCtx.fill();
+    }
+
+    if (catcherRunning) {
+      const now = performance.now();
+      // movement
+      if (leftDown) catcherTargetX -= 7;
+      if (rightDown) catcherTargetX += 7;
+      catcherTargetX = Math.max(CATCHER_IMG_W / 2, Math.min(CW - CATCHER_IMG_W / 2, catcherTargetX));
+      catcherX += (catcherTargetX - catcherX) * 0.35;
+
+      // spawn
+      const elapsed = (now - catcherStartTime) / 1000;
+      const spawnDelay = Math.max(380, 1000 - elapsed * 12);
+      if (now - lastCatcherSpawn > spawnDelay) {
+        spawnCatcherBrick();
+        lastCatcherSpawn = now;
+      }
+
+      // update + collision
+      const catchTop = CATCHER_Y_TOP + 10;
+      const catchLeft = catcherX - CATCH_ZONE_HALF;
+      const catchRight = catcherX + CATCH_ZONE_HALF;
+      for (let i = fallingBricks.length - 1; i >= 0; i--) {
+        const b = fallingBricks[i];
+        if (b._pop) {
+          b.y += b.vy; b.life -= 0.04;
+          if (b.life <= 0) fallingBricks.splice(i, 1);
+          continue;
+        }
+        b.y += b.vy;
+        // caught if brick bottom enters catch band and horizontally overlaps
+        if (
+          b.y + b.h >= catchTop &&
+          b.y <= catchTop + 30 &&
+          b.x + b.w >= catchLeft &&
+          b.x <= catchRight
+        ) {
+          if (b.type.color === 'lava') {
+            catcherLives--;
+            catcherFlash = 1;
+            popText(b.x + b.w / 2, b.y, '-1 ♥', '#ff4444');
+            updateCatcherHUD();
+            if (catcherLives <= 0) { fallingBricks.splice(i, 1); endCatcher(); continue; }
+          } else {
+            catcherScore += b.type.points;
+            popText(b.x + b.w / 2, b.y, '+' + b.type.points, '#FFCD00');
+            updateCatcherHUD();
+          }
+          fallingBricks.splice(i, 1);
+          continue;
+        }
+        if (b.y > CH + 40) fallingBricks.splice(i, 1);
+      }
+    }
+
+    // draw bricks + pop texts
+    fallingBricks.forEach(b => {
+      if (b._pop) {
+        cCtx.globalAlpha = Math.max(0, b.life);
+        cCtx.fillStyle = b.color;
+        cCtx.font = 'bold 22px Bangers, sans-serif';
+        cCtx.textAlign = 'center';
+        cCtx.fillText(b.text, b.x, b.y);
+        cCtx.globalAlpha = 1;
+      } else {
+        drawCatcherBrick(b);
+      }
+    });
+
+    // draw catcher minifig
+    if (catcherImage && catcherImage.complete && catcherImage.naturalWidth > 0) {
+      cCtx.drawImage(catcherImage, catcherX - CATCHER_IMG_W / 2, CATCHER_Y_TOP, CATCHER_IMG_W, CATCHER_IMG_H);
+    } else {
+      // fallback box
+      cCtx.fillStyle = '#FFCD00';
+      cCtx.fillRect(catcherX - 30, CATCHER_Y_TOP + 30, 60, 70);
+    }
+
+    // damage flash
+    if (catcherFlash > 0) {
+      cCtx.fillStyle = `rgba(255, 0, 0, ${catcherFlash * 0.35})`;
+      cCtx.fillRect(0, 0, CW, CH);
+      catcherFlash -= 0.04;
+    }
+  }
+  catcherLoop();
+
+  catcherStartBtn.addEventListener('click', startCatcher);
+
+  // keyboard
+  document.addEventListener('keydown', e => {
+    if (!catcherRunning) return;
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') { leftDown = true; e.preventDefault(); }
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') { rightDown = true; e.preventDefault(); }
+  });
+  document.addEventListener('keyup', e => {
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') leftDown = false;
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') rightDown = false;
+  });
+
+  // mouse follow
+  cCanvas.addEventListener('mousemove', e => {
+    if (!catcherRunning) return;
+    const rect = cCanvas.getBoundingClientRect();
+    catcherTargetX = (e.clientX - rect.left) * (CW / rect.width);
+  });
+
+  // touch
+  function handleCatcherTouch(e) {
+    if (!catcherRunning) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    if (!touch) return;
+    const rect = cCanvas.getBoundingClientRect();
+    catcherTargetX = (touch.clientX - rect.left) * (CW / rect.width);
+  }
+  cCanvas.addEventListener('touchstart', handleCatcherTouch, { passive: false });
+  cCanvas.addEventListener('touchmove', handleCatcherTouch, { passive: false });
 
   /* ============ FACTS ============ */
   const FACTS = [
