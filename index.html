@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Eddie's Brick World</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #E3000B;
+    --yellow: #FFCD00;
+    --blue: #0058A3;
+    --green: #00852B;
+    --orange: #FF7F00;
+    --purple: #7B2CBF;
+    --dark: #1A1A1A;
+    --cream: #FFF8E7;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Fredoka', system-ui, sans-serif;
+    background: var(--cream);
+    color: var(--dark);
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(circle at 25% 25%, rgba(0, 88, 163, 0.06) 8px, transparent 9px),
+      radial-gradient(circle at 75% 75%, rgba(227, 0, 11, 0.06) 8px, transparent 9px);
+    background-size: 60px 60px;
+  }
+
+  /* ----- HERO ----- */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+    background: linear-gradient(135deg, #FFCD00 0%, #FF7F00 100%);
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.3) 6px, transparent 7px);
+    background-size: 40px 40px;
+    background-position: 20px 20px;
+    pointer-events: none;
+  }
+
+  .brick-title {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(3rem, 12vw, 9rem);
+    line-height: 1;
+    text-align: center;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .brick-title span {
+    display: inline-block;
+    padding: 0.2em 0.15em;
+    margin: 0.1em 0.05em;
+    color: white;
+    border-radius: 8px;
+    box-shadow:
+      inset 0 -8px 0 rgba(0,0,0,0.25),
+      inset 0 4px 0 rgba(255,255,255,0.3),
+      0 6px 0 rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transform-origin: center bottom;
+  }
+
+  .brick-title span:hover {
+    transform: translateY(-6px) rotate(-2deg);
+  }
+
+  .brick-title span:nth-child(6n+1) { background: var(--red); }
+  .brick-title span:nth-child(6n+2) { background: var(--blue); }
+  .brick-title span:nth-child(6n+3) { background: var(--green); }
+  .brick-title span:nth-child(6n+4) { background: var(--purple); }
+  .brick-title span:nth-child(6n+5) { background: var(--orange); }
+  .brick-title span:nth-child(6n)   { background: #E3000B; }
+
+  .subtitle {
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 3px 0 rgba(0,0,0,0.2);
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    margin-bottom: 2rem;
+  }
+
+  .scroll-cue {
+    position: relative;
+    z-index: 2;
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-shadow: 0 2px 0 rgba(0,0,0,0.2);
+    animation: bounce 1.6s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(10px); }
+  }
+
+  .floating-brick {
+    position: absolute;
+    width: 80px;
+    height: 50px;
+    border-radius: 6px;
+    box-shadow: inset 0 -8px 0 rgba(0,0,0,0.25), inset 0 4px 0 rgba(255,255,255,0.3);
+    animation: float 6s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  .floating-brick::before, .floating-brick::after {
+    content: "";
+    position: absolute;
+    top: -10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: inherit;
+    box-shadow: inset 0 -4px 0 rgba(0,0,0,0.25), inset 0 2px 0 rgba(255,255,255,0.3);
+  }
+  .floating-brick::before { left: 14px; }
+  .floating-brick::after { right: 14px; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+  }
+
+  /* ----- SECTION SHARED ----- */
+  section.zone {
+    padding: 5rem 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .zone-title {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    text-align: center;
+    margin-bottom: 2.5rem;
+    color: var(--dark);
+    letter-spacing: 0.05em;
+  }
+
+  .zone-title::before, .zone-title::after {
+    content: "🧱";
+    margin: 0 0.5rem;
+  }
+
+  /* ----- MINIFIG CUSTOMIZER ----- */
+  .minifig-zone {
+    background: white;
+    border-radius: 24px;
+    padding: 3rem 2rem;
+    box-shadow: 0 12px 0 rgba(0,0,0,0.1), 0 20px 40px rgba(0,0,0,0.08);
+    border: 4px solid var(--dark);
+  }
+
+  .minifig-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  @media (max-width: 720px) {
+    .minifig-layout { grid-template-columns: 1fr; }
+  }
+
+  .minifig-stage {
+    background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 100%);
+    border-radius: 16px;
+    padding: 2rem 1rem 1rem;
+    position: relative;
+    overflow: hidden;
+    border: 4px solid var(--dark);
+  }
+
+  .minifig-stage::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: var(--green);
+    background-image: radial-gradient(circle at 20px 10px, rgba(0,0,0,0.2) 6px, transparent 7px);
+    background-size: 40px 40px;
+  }
+
+  #minifig-svg {
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .control-group label {
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+  }
+
+  .control-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .swatch {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    border: 3px solid var(--dark);
+    cursor: pointer;
+    box-shadow: inset 0 -6px 0 rgba(0,0,0,0.25), inset 0 3px 0 rgba(255,255,255,0.3);
+    transition: transform 0.15s ease;
+  }
+
+  .swatch:hover { transform: translateY(-3px); }
+  .swatch.active {
+    outline: 4px solid var(--yellow);
+    outline-offset: 2px;
+  }
+
+  .face-btn, .hair-btn {
+    background: white;
+    border: 3px solid var(--dark);
+    border-radius: 10px;
+    padding: 0.4rem 0.7rem;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--dark);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+
+  .face-btn:hover, .hair-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 var(--dark);
+  }
+
+  .face-btn.active, .hair-btn.active {
+    background: var(--yellow);
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 var(--dark);
+  }
+
+  .big-btn {
+    background: var(--red);
+    color: white;
+    border: 3px solid var(--dark);
+    border-radius: 12px;
+    padding: 0.8rem 1.5rem;
+    font-family: 'Bangers', cursive;
+    font-size: 1.3rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    box-shadow: 0 6px 0 var(--dark);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    margin-top: 0.5rem;
+    align-self: flex-start;
+  }
+
+  .big-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 0 var(--dark);
+  }
+
+  .big-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 var(--dark);
+  }
+
+  /* ----- MINIFIG GALLERY ----- */
+  .gallery-section {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 3px dashed rgba(0,0,0,0.15);
+  }
+
+  .gallery-header {
+    font-family: 'Bangers', cursive;
+    font-size: 1.6rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.25rem;
+    text-align: center;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+
+  .gallery-empty {
+    text-align: center;
+    color: rgba(0,0,0,0.5);
+    font-weight: 600;
+    padding: 1.5rem;
+  }
+
+  .minifig-card {
+    background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 100%);
+    border: 3px solid var(--dark);
+    border-radius: 12px;
+    padding: 0.5rem;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 4px 0 var(--dark);
+  }
+
+  .minifig-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 0 var(--dark);
+  }
+
+  .minifig-card svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .minifig-card .name {
+    background: white;
+    border: 2px solid var(--dark);
+    border-radius: 6px;
+    padding: 0.25rem 0.4rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: 0.4rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .minifig-card .delete-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--red);
+    color: white;
+    border: 3px solid var(--dark);
+    font-family: 'Bangers', cursive;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 3px 0 var(--dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+  }
+
+  .minifig-card .delete-btn:hover {
+    transform: scale(1.1);
+  }
+
+  /* ----- BRICK STACKER GAME ----- */
+  .game-zone {
+    background: var(--dark);
+    border-radius: 24px;
+    padding: 3rem 2rem;
+    color: white;
+    border: 4px solid var(--dark);
+  }
+
+  .game-zone .zone-title { color: var(--yellow); }
+
+  .game-hud {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .hud-item {
+    background: white;
+    color: var(--dark);
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-family: 'Bangers', cursive;
+    font-size: 1.5rem;
+    border: 3px solid var(--dark);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+  }
+
+  .hud-item span { color: var(--red); }
+
+  #stacker-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    border: 4px solid var(--yellow);
+    border-radius: 16px;
+    overflow: hidden;
+    aspect-ratio: 400 / 520;
+  }
+
+  #stacker-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #1e3a5f 0%, #0f1e2e 100%);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .game-message {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.85);
+    color: white;
+    font-family: 'Bangers', cursive;
+    text-align: center;
+    padding: 2rem;
+    z-index: 10;
+  }
+
+  .game-message h3 {
+    font-size: 3rem;
+    color: var(--yellow);
+    margin-bottom: 1rem;
+  }
+
+  .game-message p {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+  }
+
+  /* ----- FAVORITES ----- */
+  .themes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .theme-card {
+    background: white;
+    border: 4px solid var(--dark);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 8px 0 var(--dark);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+
+  .theme-card:hover {
+    transform: translateY(-6px) rotate(-1deg);
+    box-shadow: 0 14px 0 var(--dark);
+  }
+
+  .theme-icon {
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .theme-name {
+    font-family: 'Bangers', cursive;
+    font-size: 1.5rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* ----- FACTS ----- */
+  .fact-zone {
+    background: var(--blue);
+    color: white;
+    border-radius: 24px;
+    padding: 3rem 2rem;
+    text-align: center;
+    border: 4px solid var(--dark);
+    box-shadow: 0 12px 0 rgba(0,0,0,0.2);
+  }
+
+  .fact-zone .zone-title { color: white; }
+  .fact-zone .zone-title::before, .fact-zone .zone-title::after { content: "💡"; }
+
+  #fact-text {
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    font-weight: 600;
+    max-width: 700px;
+    margin: 0 auto 1.5rem;
+    min-height: 4rem;
+    line-height: 1.5;
+  }
+
+  /* ----- MOUSE TRAIL ----- */
+  .trail-brick {
+    position: fixed;
+    width: 18px;
+    height: 12px;
+    border-radius: 3px;
+    pointer-events: none;
+    z-index: 9999;
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,0.3), inset 0 2px 0 rgba(255,255,255,0.3);
+    animation: trail-fade 0.9s ease-out forwards;
+  }
+
+  .trail-brick::before, .trail-brick::after {
+    content: "";
+    position: absolute;
+    top: -3px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: inherit;
+  }
+  .trail-brick::before { left: 3px; }
+  .trail-brick::after { right: 3px; }
+
+  @keyframes trail-fade {
+    0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 0.9; }
+    100% { transform: translate(-50%, 30px) scale(0.3) rotate(180deg); opacity: 0; }
+  }
+
+  /* ----- RAINBOW MODE ----- */
+  body.rainbow-mode {
+    animation: rainbow-bg 6s linear infinite;
+  }
+
+  @keyframes rainbow-bg {
+    0%   { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+  }
+
+  body.rainbow-mode .hero,
+  body.rainbow-mode .game-zone,
+  body.rainbow-mode .fact-zone {
+    animation: rainbow-bg 4s linear infinite;
+  }
+
+  .rainbow-toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Bangers', cursive;
+    font-size: clamp(3rem, 10vw, 6rem);
+    color: white;
+    text-shadow:
+      3px 3px 0 #E3000B,
+      6px 6px 0 #FF7F00,
+      9px 9px 0 #FFCD00,
+      12px 12px 0 #00852B,
+      15px 15px 0 #0058A3,
+      18px 18px 0 #7B2CBF;
+    pointer-events: none;
+    z-index: 10000;
+    animation: rainbow-pop 2s ease-out forwards;
+  }
+
+  @keyframes rainbow-pop {
+    0% { transform: translate(-50%, -50%) scale(0.3) rotate(-20deg); opacity: 0; }
+    20% { transform: translate(-50%, -50%) scale(1.2) rotate(5deg); opacity: 1; }
+    80% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.5) rotate(0deg); opacity: 0; }
+  }
+
+  .confetti-brick {
+    position: fixed;
+    width: 24px;
+    height: 16px;
+    border-radius: 3px;
+    pointer-events: none;
+    z-index: 9998;
+    box-shadow: inset 0 -4px 0 rgba(0,0,0,0.3), inset 0 2px 0 rgba(255,255,255,0.3);
+  }
+
+  .confetti-brick::before, .confetti-brick::after {
+    content: "";
+    position: absolute;
+    top: -4px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: inherit;
+  }
+  .confetti-brick::before { left: 4px; }
+  .confetti-brick::after { right: 4px; }
+
+  /* ----- FOOTER ----- */
+  footer {
+    text-align: center;
+    padding: 2rem 1rem 3rem;
+    font-weight: 600;
+    color: var(--dark);
+    opacity: 0.7;
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="floating-brick" style="background: var(--red); top: 10%; left: 8%; animation-delay: 0s;"></div>
+    <div class="floating-brick" style="background: var(--blue); top: 20%; right: 10%; animation-delay: 1.5s;"></div>
+    <div class="floating-brick" style="background: var(--green); bottom: 15%; left: 12%; animation-delay: 3s;"></div>
+    <div class="floating-brick" style="background: var(--purple); bottom: 25%; right: 8%; animation-delay: 4.5s;"></div>
+
+    <h1 class="brick-title" id="brick-title"></h1>
+    <p class="subtitle">★ Eddie the Handsome ★</p>
+    <div class="scroll-cue">▼ Scroll to play ▼</div>
+  </section>
+
+  <!-- ============ MINIFIG CUSTOMIZER ============ -->
+  <section class="zone">
+    <h2 class="zone-title">Build Your Minifig</h2>
+    <div class="minifig-zone">
+      <div class="minifig-layout">
+        <div class="minifig-stage">
+          <svg id="minifig-svg" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
+            <!-- Hair (drawn first, behind head) -->
+            <g id="hair-group"></g>
+            <!-- Head -->
+            <rect x="65" y="40" width="70" height="65" rx="8" fill="#FFCD00" stroke="#000" stroke-width="2"/>
+            <!-- Face -->
+            <g id="face-group"></g>
+            <!-- Neck -->
+            <rect x="88" y="100" width="24" height="10" fill="#C9A100" stroke="#000" stroke-width="2"/>
+            <!-- Torso -->
+            <path id="torso" d="M50 110 L150 110 L160 195 L40 195 Z" fill="var(--red)" stroke="#000" stroke-width="2"/>
+            <!-- Arms -->
+            <path id="arm-left" d="M50 115 L32 180 L48 192 L68 130 Z" fill="var(--red)" stroke="#000" stroke-width="2"/>
+            <path id="arm-right" d="M150 115 L168 180 L152 192 L132 130 Z" fill="var(--red)" stroke="#000" stroke-width="2"/>
+            <!-- Hands -->
+            <circle cx="40" cy="195" r="11" fill="#FFCD00" stroke="#000" stroke-width="2"/>
+            <circle cx="160" cy="195" r="11" fill="#FFCD00" stroke="#000" stroke-width="2"/>
+            <!-- Belt -->
+            <rect x="40" y="190" width="120" height="8" fill="#333" stroke="#000" stroke-width="2"/>
+            <!-- Legs -->
+            <rect id="leg-left" x="62" y="198" width="36" height="70" fill="var(--blue)" stroke="#000" stroke-width="2"/>
+            <rect id="leg-right" x="102" y="198" width="36" height="70" fill="var(--blue)" stroke="#000" stroke-width="2"/>
+            <!-- Feet -->
+            <rect x="58" y="265" width="40" height="10" rx="3" fill="#000"/>
+            <rect x="102" y="265" width="40" height="10" rx="3" fill="#000"/>
+          </svg>
+        </div>
+
+        <div class="controls">
+          <div class="control-group">
+            <label>👕 Shirt Color</label>
+            <div class="control-buttons" id="torso-controls"></div>
+          </div>
+          <div class="control-group">
+            <label>👖 Legs Color</label>
+            <div class="control-buttons" id="legs-controls"></div>
+          </div>
+          <div class="control-group">
+            <label>💇 Hair Style</label>
+            <div class="control-buttons" id="hair-controls"></div>
+          </div>
+          <div class="control-group">
+            <label>😀 Face</label>
+            <div class="control-buttons" id="face-controls"></div>
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="big-btn" id="randomize-btn">🎲 Randomize!</button>
+            <button class="big-btn" id="save-minifig-btn" style="background: var(--green);">💾 Save</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-section">
+        <h3 class="gallery-header">📦 My Minifig Collection</h3>
+        <div class="gallery-grid" id="gallery-grid"></div>
+        <p class="gallery-empty" id="gallery-empty">No minifigs saved yet — build one and hit Save!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BRICK STACKER GAME ============ -->
+  <section class="zone">
+    <h2 class="zone-title" style="color: var(--red);">Brick Stacker</h2>
+    <div class="game-zone">
+      <div class="game-hud">
+        <div class="hud-item">STACK <span id="stack-count">0</span></div>
+        <div class="hud-item">BEST <span id="best">0</span></div>
+      </div>
+      <div id="stacker-wrap">
+        <canvas id="stacker-canvas" width="400" height="520"></canvas>
+        <div class="game-message" id="game-message">
+          <h3>BRICK STACKER!</h3>
+          <p>Tap or press SPACE to drop the brick.<br>Line it up perfectly to keep it full size!</p>
+          <button class="big-btn" id="start-btn">▶ START</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAVORITE THEMES ============ -->
+  <section class="zone">
+    <h2 class="zone-title">Favorite Themes</h2>
+    <div class="themes-grid">
+      <div class="theme-card" style="background: #FFE5E5;">
+        <span class="theme-icon">⚔️</span>
+        <div class="theme-name">Star Wars</div>
+      </div>
+      <div class="theme-card" style="background: #E5F0FF;">
+        <span class="theme-icon">🥷</span>
+        <div class="theme-name">Ninjago</div>
+      </div>
+      <div class="theme-card" style="background: #E5FFE9;">
+        <span class="theme-icon">🏙️</span>
+        <div class="theme-name">City</div>
+      </div>
+      <div class="theme-card" style="background: #FFF4D6;">
+        <span class="theme-icon">⚙️</span>
+        <div class="theme-name">Technic</div>
+      </div>
+      <div class="theme-card" style="background: #F0E5FF;">
+        <span class="theme-icon">🦸</span>
+        <div class="theme-name">Super Heroes</div>
+      </div>
+      <div class="theme-card" style="background: #FFE5F4;">
+        <span class="theme-icon">🚂</span>
+        <div class="theme-name">Trains</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FACTS ============ -->
+  <section class="zone">
+    <div class="fact-zone">
+      <h2 class="zone-title">Did You Know?</h2>
+      <p id="fact-text"></p>
+      <button class="big-btn" id="fact-btn" style="background: var(--yellow); color: var(--dark);">🔄 Next Fact</button>
+    </div>
+  </section>
+
+  <footer>
+    Built with bricks of love for Eddie 🧱
+  </footer>
+
+<script>
+  /* ============ HERO BRICK TITLE ============ */
+  const titleEl = document.getElementById('brick-title');
+  "EDDIE'S BRICK WORLD".split('').forEach(ch => {
+    const span = document.createElement('span');
+    span.textContent = ch === ' ' ? ' ' : ch;
+    if (ch === ' ') span.style.background = 'transparent', span.style.boxShadow = 'none';
+    titleEl.appendChild(span);
+  });
+
+  /* ============ MOUSE TRAIL ============ */
+  const TRAIL_COLORS = ['#E3000B', '#0058A3', '#00852B', '#FFCD00', '#FF7F00', '#7B2CBF', '#FF1493', '#00CED1'];
+  let lastTrailTime = 0;
+  document.addEventListener('mousemove', e => {
+    const now = Date.now();
+    if (now - lastTrailTime < 35) return;
+    lastTrailTime = now;
+    const brick = document.createElement('div');
+    brick.className = 'trail-brick';
+    brick.style.background = TRAIL_COLORS[Math.floor(Math.random() * TRAIL_COLORS.length)];
+    brick.style.left = e.clientX + 'px';
+    brick.style.top = e.clientY + 'px';
+    document.body.appendChild(brick);
+    setTimeout(() => brick.remove(), 900);
+  });
+
+  /* ============ RAINBOW MODE EASTER EGG ============ */
+  let titleClicks = 0;
+  let rainbowActive = false;
+  titleEl.addEventListener('click', () => {
+    if (rainbowActive) return;
+    titleClicks++;
+    if (titleClicks >= 10) activateRainbowMode();
+  });
+
+  function activateRainbowMode() {
+    rainbowActive = true;
+    document.body.classList.add('rainbow-mode');
+
+    const toast = document.createElement('div');
+    toast.className = 'rainbow-toast';
+    toast.textContent = '🌈 RAINBOW MODE! 🌈';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+
+    for (let i = 0; i < 60; i++) {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti-brick';
+      confetti.style.background = TRAIL_COLORS[Math.floor(Math.random() * TRAIL_COLORS.length)];
+      confetti.style.left = window.innerWidth / 2 + 'px';
+      confetti.style.top = window.innerHeight / 2 + 'px';
+      document.body.appendChild(confetti);
+      const angle = Math.random() * Math.PI * 2;
+      const velocity = 200 + Math.random() * 400;
+      const dx = Math.cos(angle) * velocity;
+      const dy = Math.sin(angle) * velocity - 200;
+      const rot = Math.random() * 720 - 360;
+      confetti.animate([
+        { transform: 'translate(-50%, -50%) rotate(0deg)', opacity: 1 },
+        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) rotate(${rot}deg)`, opacity: 1, offset: 0.6 },
+        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy + 600}px)) rotate(${rot * 1.5}deg)`, opacity: 0 }
+      ], { duration: 2500, easing: 'cubic-bezier(0.2, 0.6, 0.4, 1)' });
+      setTimeout(() => confetti.remove(), 2500);
+    }
+  }
+
+  /* ============ MINIFIG CUSTOMIZER ============ */
+  const COLORS = {
+    red: '#E3000B', blue: '#0058A3', green: '#00852B',
+    yellow: '#FFCD00', orange: '#FF7F00', purple: '#7B2CBF',
+    black: '#1A1A1A', white: '#FFFFFF'
+  };
+
+  const HAIR_STYLES = {
+    none: '',
+    short: '<path d="M55 50 Q55 25 100 22 Q145 25 145 50 L140 55 Q130 35 100 35 Q70 35 60 55 Z" fill="#4A2C1A" stroke="#000" stroke-width="2"/>',
+    spiky: '<path d="M55 50 L60 25 L72 40 L80 20 L92 38 L100 18 L108 38 L120 20 L128 40 L140 25 L145 50 Q130 38 100 38 Q70 38 55 50 Z" fill="#D4421E" stroke="#000" stroke-width="2"/>',
+    long: '<path d="M52 125 L52 50 Q52 22 100 22 Q148 22 148 50 L148 125 L132 125 L132 55 Q120 42 100 42 Q80 42 68 55 L68 125 Z" fill="#FFD700" stroke="#000" stroke-width="2"/>',
+    hat: '<path d="M50 55 L150 55 L145 35 L55 35 Z" fill="#00852B" stroke="#000" stroke-width="2"/><rect x="40" y="50" width="120" height="10" fill="#00852B" stroke="#000" stroke-width="2"/><circle cx="100" cy="28" r="6" fill="#FFCD00" stroke="#000" stroke-width="2"/>',
+    cap: '<path d="M58 48 Q58 18 100 18 Q142 18 142 48 Z" fill="#0058A3" stroke="#000" stroke-width="2"/><ellipse cx="100" cy="50" rx="52" ry="5" fill="#0058A3" stroke="#000" stroke-width="2"/>'
+  };
+
+  const FACES = {
+    happy: '<circle cx="85" cy="70" r="3.5" fill="#000"/><circle cx="115" cy="70" r="3.5" fill="#000"/><path d="M85 82 Q100 92 115 82" stroke="#000" fill="none" stroke-width="2.5" stroke-linecap="round"/>',
+    cool: '<rect x="78" y="62" width="20" height="10" rx="2" fill="#000"/><rect x="102" y="62" width="20" height="10" rx="2" fill="#000"/><path d="M98 67 L102 67" stroke="#000" stroke-width="2"/><path d="M85 88 Q100 90 115 88" stroke="#000" fill="none" stroke-width="2.5" stroke-linecap="round"/>',
+    wink: '<circle cx="85" cy="70" r="3.5" fill="#000"/><path d="M110 70 L120 70" stroke="#000" stroke-width="2.5" stroke-linecap="round"/><path d="M85 82 Q100 92 115 82" stroke="#000" fill="none" stroke-width="2.5" stroke-linecap="round"/>',
+    surprised: '<circle cx="85" cy="70" r="4" fill="#000"/><circle cx="115" cy="70" r="4" fill="#000"/><ellipse cx="100" cy="88" rx="5" ry="6" fill="#000"/>',
+    angry: '<path d="M78 65 L92 72" stroke="#000" stroke-width="3" stroke-linecap="round"/><path d="M122 65 L108 72" stroke="#000" stroke-width="3" stroke-linecap="round"/><circle cx="85" cy="72" r="3" fill="#000"/><circle cx="115" cy="72" r="3" fill="#000"/><path d="M85 90 Q100 82 115 90" stroke="#000" fill="none" stroke-width="2.5" stroke-linecap="round"/>',
+    tongue: '<circle cx="85" cy="70" r="3.5" fill="#000"/><circle cx="115" cy="70" r="3.5" fill="#000"/><path d="M85 82 Q100 95 115 82" stroke="#000" fill="none" stroke-width="2.5" stroke-linecap="round"/><ellipse cx="100" cy="91" rx="5" ry="4" fill="#E3000B"/>'
+  };
+
+  const state = {
+    torso: 'red',
+    legs: 'blue',
+    hair: 'short',
+    face: 'happy'
+  };
+
+  function render() {
+    document.getElementById('torso').setAttribute('fill', COLORS[state.torso]);
+    document.getElementById('arm-left').setAttribute('fill', COLORS[state.torso]);
+    document.getElementById('arm-right').setAttribute('fill', COLORS[state.torso]);
+    document.getElementById('leg-left').setAttribute('fill', COLORS[state.legs]);
+    document.getElementById('leg-right').setAttribute('fill', COLORS[state.legs]);
+    document.getElementById('hair-group').innerHTML = HAIR_STYLES[state.hair];
+    document.getElementById('face-group').innerHTML = FACES[state.face];
+    updateActive();
+    localStorage.setItem('eddie-minifig', JSON.stringify(state));
+  }
+
+  function updateActive() {
+    document.querySelectorAll('[data-torso]').forEach(b => b.classList.toggle('active', b.dataset.torso === state.torso));
+    document.querySelectorAll('[data-legs]').forEach(b => b.classList.toggle('active', b.dataset.legs === state.legs));
+    document.querySelectorAll('[data-hair]').forEach(b => b.classList.toggle('active', b.dataset.hair === state.hair));
+    document.querySelectorAll('[data-face]').forEach(b => b.classList.toggle('active', b.dataset.face === state.face));
+  }
+
+  // Build controls
+  const torsoColors = ['red', 'blue', 'green', 'yellow', 'orange', 'purple', 'black', 'white'];
+  const legsColors = ['blue', 'black', 'red', 'green', 'orange', 'purple'];
+  torsoColors.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'swatch';
+    btn.style.background = COLORS[c];
+    btn.dataset.torso = c;
+    btn.addEventListener('click', () => { state.torso = c; render(); });
+    document.getElementById('torso-controls').appendChild(btn);
+  });
+  legsColors.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'swatch';
+    btn.style.background = COLORS[c];
+    btn.dataset.legs = c;
+    btn.addEventListener('click', () => { state.legs = c; render(); });
+    document.getElementById('legs-controls').appendChild(btn);
+  });
+
+  const hairOptions = [
+    { key: 'short', label: 'Short' },
+    { key: 'spiky', label: 'Spiky' },
+    { key: 'long', label: 'Long' },
+    { key: 'cap', label: 'Cap' },
+    { key: 'hat', label: 'Hat' },
+    { key: 'none', label: 'Bald' }
+  ];
+  hairOptions.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'hair-btn';
+    btn.textContent = o.label;
+    btn.dataset.hair = o.key;
+    btn.addEventListener('click', () => { state.hair = o.key; render(); });
+    document.getElementById('hair-controls').appendChild(btn);
+  });
+
+  const faceOptions = [
+    { key: 'happy', label: '😀' },
+    { key: 'cool', label: '😎' },
+    { key: 'wink', label: '😉' },
+    { key: 'surprised', label: '😮' },
+    { key: 'angry', label: '😠' },
+    { key: 'tongue', label: '😝' }
+  ];
+  faceOptions.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'face-btn';
+    btn.textContent = o.label;
+    btn.dataset.face = o.key;
+    btn.style.fontSize = '1.4rem';
+    btn.addEventListener('click', () => { state.face = o.key; render(); });
+    document.getElementById('face-controls').appendChild(btn);
+  });
+
+  document.getElementById('randomize-btn').addEventListener('click', () => {
+    state.torso = torsoColors[Math.floor(Math.random() * torsoColors.length)];
+    state.legs = legsColors[Math.floor(Math.random() * legsColors.length)];
+    state.hair = hairOptions[Math.floor(Math.random() * hairOptions.length)].key;
+    state.face = faceOptions[Math.floor(Math.random() * faceOptions.length)].key;
+    render();
+  });
+
+  // Restore saved state
+  const saved = localStorage.getItem('eddie-minifig');
+  if (saved) {
+    try { Object.assign(state, JSON.parse(saved)); } catch (e) {}
+  }
+  render();
+
+  /* ============ MINIFIG GALLERY ============ */
+  const galleryGrid = document.getElementById('gallery-grid');
+  const galleryEmpty = document.getElementById('gallery-empty');
+  const saveBtn = document.getElementById('save-minifig-btn');
+
+  function loadCollection() {
+    try { return JSON.parse(localStorage.getItem('eddie-minifig-collection') || '[]'); }
+    catch (e) { return []; }
+  }
+
+  function saveCollection(col) {
+    localStorage.setItem('eddie-minifig-collection', JSON.stringify(col));
+  }
+
+  function minifigPreviewSVG(s) {
+    return `
+      <svg viewBox="0 0 200 285" xmlns="http://www.w3.org/2000/svg">
+        ${HAIR_STYLES[s.hair] || ''}
+        <rect x="65" y="40" width="70" height="65" rx="8" fill="#FFCD00" stroke="#000" stroke-width="2"/>
+        ${FACES[s.face] || ''}
+        <rect x="88" y="100" width="24" height="10" fill="#C9A100" stroke="#000" stroke-width="2"/>
+        <path d="M50 110 L150 110 L160 195 L40 195 Z" fill="${COLORS[s.torso]}" stroke="#000" stroke-width="2"/>
+        <path d="M50 115 L32 180 L48 192 L68 130 Z" fill="${COLORS[s.torso]}" stroke="#000" stroke-width="2"/>
+        <path d="M150 115 L168 180 L152 192 L132 130 Z" fill="${COLORS[s.torso]}" stroke="#000" stroke-width="2"/>
+        <circle cx="40" cy="195" r="11" fill="#FFCD00" stroke="#000" stroke-width="2"/>
+        <circle cx="160" cy="195" r="11" fill="#FFCD00" stroke="#000" stroke-width="2"/>
+        <rect x="40" y="190" width="120" height="8" fill="#333" stroke="#000" stroke-width="2"/>
+        <rect x="62" y="198" width="36" height="70" fill="${COLORS[s.legs]}" stroke="#000" stroke-width="2"/>
+        <rect x="102" y="198" width="36" height="70" fill="${COLORS[s.legs]}" stroke="#000" stroke-width="2"/>
+        <rect x="58" y="265" width="40" height="10" rx="3" fill="#000"/>
+        <rect x="102" y="265" width="40" height="10" rx="3" fill="#000"/>
+      </svg>
+    `;
+  }
+
+  function renderGallery() {
+    const col = loadCollection();
+    galleryGrid.innerHTML = '';
+    galleryEmpty.style.display = col.length === 0 ? 'block' : 'none';
+    col.forEach((entry, idx) => {
+      const card = document.createElement('div');
+      card.className = 'minifig-card';
+      card.innerHTML = `
+        ${minifigPreviewSVG(entry.state)}
+        <div class="name">${escapeHTML(entry.name)}</div>
+        <button class="delete-btn" aria-label="Delete">✕</button>
+      `;
+      card.addEventListener('click', e => {
+        if (e.target.classList.contains('delete-btn')) return;
+        Object.assign(state, entry.state);
+        render();
+        document.querySelector('.minifig-zone').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+      card.querySelector('.delete-btn').addEventListener('click', e => {
+        e.stopPropagation();
+        const updated = loadCollection().filter((_, i) => i !== idx);
+        saveCollection(updated);
+        renderGallery();
+      });
+      galleryGrid.appendChild(card);
+    });
+  }
+
+  function escapeHTML(str) {
+    return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  saveBtn.addEventListener('click', () => {
+    const name = prompt('Name this minifig:', 'Minifig ' + (loadCollection().length + 1));
+    if (!name) return;
+    const col = loadCollection();
+    col.push({ name: name.slice(0, 24), state: { ...state } });
+    saveCollection(col);
+    renderGallery();
+  });
+
+  renderGallery();
+
+  /* ============ BRICK STACKER GAME ============ */
+  const canvas = document.getElementById('stacker-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  const H = canvas.height;
+  const BRICK_H = 30;
+  const STACK_COLORS = ['#E3000B', '#0058A3', '#00852B', '#FFCD00', '#FF7F00', '#7B2CBF', '#FF1493', '#00CED1'];
+
+  const stackCountEl = document.getElementById('stack-count');
+  const bestEl = document.getElementById('best');
+  const stackerMessage = document.getElementById('game-message');
+  const stackerStartBtn = document.getElementById('start-btn');
+
+  let stack = [];
+  let falling = [];
+  let current = null;
+  let stackScore = 0;
+  let stackerRunning = false;
+  let bestStack = parseInt(localStorage.getItem('eddie-stack-best') || '0', 10);
+  bestEl.textContent = bestStack;
+
+  function drawBrick(x, y, w, color, rot = 0) {
+    ctx.save();
+    if (rot) {
+      ctx.translate(x + w / 2, y + BRICK_H / 2);
+      ctx.rotate(rot);
+      ctx.translate(-(x + w / 2), -(y + BRICK_H / 2));
+    }
+    ctx.fillStyle = color;
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    roundRect(ctx, x, y, w, BRICK_H, 4);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.fillRect(x + 2, y + 2, w - 4, 5);
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fillRect(x + 2, y + BRICK_H - 7, w - 4, 5);
+    const studCount = Math.max(1, Math.floor(w / 22));
+    const studSpacing = w / studCount;
+    ctx.fillStyle = color;
+    for (let i = 0; i < studCount; i++) {
+      const sx = x + studSpacing * i + studSpacing / 2;
+      ctx.beginPath();
+      ctx.arc(sx, y - 1, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function startStacker() {
+    stack = [];
+    falling = [];
+    stackScore = 0;
+    stackCountEl.textContent = '0';
+    const baseWidth = 180;
+    stack.push({ x: (W - baseWidth) / 2, y: H - BRICK_H - 8, width: baseWidth, color: STACK_COLORS[0] });
+    spawnStackBrick();
+    stackerRunning = true;
+    stackerMessage.style.display = 'none';
+    requestAnimationFrame(stackerLoop);
+  }
+
+  function spawnStackBrick() {
+    const top = stack[stack.length - 1];
+    const dir = stack.length % 2 === 0 ? 1 : -1;
+    current = {
+      x: dir > 0 ? -top.width : W,
+      y: top.y - BRICK_H,
+      width: top.width,
+      color: STACK_COLORS[stack.length % STACK_COLORS.length],
+      dir,
+      speed: 2.2 + Math.min(stack.length * 0.12, 4)
+    };
+  }
+
+  function dropBrick() {
+    if (!stackerRunning) return;
+    const top = stack[stack.length - 1];
+    const left = Math.max(current.x, top.x);
+    const right = Math.min(current.x + current.width, top.x + top.width);
+    const overlap = right - left;
+
+    if (overlap <= 0) {
+      // Whole brick falls off
+      falling.push({ ...current, vy: 0, rot: 0, vrot: (Math.random() - 0.5) * 0.2 });
+      endStacker();
+      return;
+    }
+
+    // Falling overhang piece
+    if (current.x < top.x) {
+      const overWidth = top.x - current.x;
+      falling.push({ x: current.x, y: current.y, width: overWidth, color: current.color, vy: 0, rot: 0, vrot: -0.15 });
+    } else if (current.x + current.width > top.x + top.width) {
+      const overWidth = current.x + current.width - (top.x + top.width);
+      falling.push({ x: top.x + top.width, y: current.y, width: overWidth, color: current.color, vy: 0, rot: 0, vrot: 0.15 });
+    }
+
+    stack.push({ x: left, y: current.y, width: overlap, color: current.color });
+    stackScore++;
+    stackCountEl.textContent = stackScore;
+
+    // Shift the stack down if it's getting too tall
+    if (current.y < H * 0.35) {
+      const shift = BRICK_H;
+      stack.forEach(b => b.y += shift);
+    }
+
+    spawnStackBrick();
+  }
+
+  function endStacker() {
+    stackerRunning = false;
+    setTimeout(() => {
+      const isNew = stackScore > bestStack;
+      if (isNew) {
+        bestStack = stackScore;
+        localStorage.setItem('eddie-stack-best', bestStack);
+        bestEl.textContent = bestStack;
+      }
+      stackerMessage.querySelector('h3').textContent = isNew ? '🏆 NEW BEST!' : 'GAME OVER';
+      stackerMessage.querySelector('p').innerHTML = `You stacked <strong>${stackScore}</strong> brick${stackScore === 1 ? '' : 's'}!`;
+      stackerStartBtn.textContent = '▶ PLAY AGAIN';
+      stackerMessage.style.display = 'flex';
+    }, 900);
+  }
+
+  function stackerLoop() {
+    ctx.clearRect(0, 0, W, H);
+    // Background gradient
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#1e3a5f');
+    grad.addColorStop(1, '#0f1e2e');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+    // Dot pattern
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    for (let y = 15; y < H; y += 30) {
+      for (let x = 15; x < W; x += 30) {
+        ctx.fillRect(x, y, 2, 2);
+      }
+    }
+
+    // Move + draw current
+    if (stackerRunning && current) {
+      current.x += current.dir * current.speed;
+      if (current.x + current.width > W) { current.x = W - current.width; current.dir = -1; }
+      if (current.x < 0) { current.x = 0; current.dir = 1; }
+    }
+
+    // Draw stack
+    stack.forEach(b => {
+      if (b.y < H + 50) drawBrick(b.x, b.y, b.width, b.color);
+    });
+
+    // Draw current
+    if (current && stackerRunning) drawBrick(current.x, current.y, current.width, current.color);
+
+    // Falling pieces
+    falling.forEach(f => {
+      f.vy += 0.5;
+      f.y += f.vy;
+      f.rot += f.vrot;
+      drawBrick(f.x, f.y, f.width, f.color, f.rot);
+    });
+    falling = falling.filter(f => f.y < H + 100);
+
+    requestAnimationFrame(stackerLoop);
+  }
+
+  // Initial draw (background only)
+  stackerLoop();
+
+  stackerStartBtn.addEventListener('click', startStacker);
+  canvas.addEventListener('click', () => { if (stackerRunning) dropBrick(); });
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space' && stackerRunning) { e.preventDefault(); dropBrick(); }
+  });
+
+  /* ============ FACTS ============ */
+  const FACTS = [
+    "The word 'LEGO' comes from the Danish phrase 'leg godt' which means 'play well'.",
+    "Six 2x4 LEGO bricks can be combined in over 915 million ways!",
+    "If you stacked all the LEGO bricks ever made, they'd reach the moon and back ten times.",
+    "The tallest LEGO tower ever built was over 114 feet tall — taller than a 10-story building!",
+    "LEGO makes more tires every year than any tire company in the world.",
+    "There are about 80 LEGO bricks for every person on Earth.",
+    "A single 2x4 LEGO brick can support up to 950 pounds of weight before breaking.",
+    "LEGO minifigures were invented in 1978, and their smile has barely changed since.",
+    "The Star Wars Millennium Falcon LEGO set has 7,541 pieces — one of the biggest ever!",
+    "LEGO bricks made today still fit perfectly with bricks made in 1958."
+  ];
+
+  let factIndex = Math.floor(Math.random() * FACTS.length);
+  function showFact() {
+    document.getElementById('fact-text').textContent = FACTS[factIndex];
+    factIndex = (factIndex + 1) % FACTS.length;
+  }
+  showFact();
+  document.getElementById('fact-btn').addEventListener('click', showFact);
+</script>
+</body>
+</html>
