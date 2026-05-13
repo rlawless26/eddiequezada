@@ -496,6 +496,65 @@
 
   #catcher-lives { letter-spacing: 0.05em; }
 
+  .catcher-picker-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0 0 1rem;
+    flex-wrap: wrap;
+  }
+
+  .catcher-picker-label {
+    font-family: 'Bangers', cursive;
+    font-size: 1.05rem;
+    color: var(--yellow);
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .catcher-picker {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 0.25rem 0.1rem 0.5rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .catcher-option {
+    flex-shrink: 0;
+    width: 64px;
+    background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 100%);
+    border: 2px solid var(--dark);
+    border-radius: 8px;
+    padding: 3px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .catcher-option:hover { transform: translateY(-2px); }
+
+  .catcher-option.active {
+    box-shadow: 0 0 0 3px var(--yellow);
+    transform: translateY(-2px);
+  }
+
+  .catcher-option svg { width: 100%; height: auto; display: block; }
+
+  .catcher-option .label {
+    text-align: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--dark);
+    background: white;
+    border-radius: 4px;
+    padding: 1px 3px;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .game-message {
     position: absolute;
     inset: 0;
@@ -802,6 +861,10 @@
         <div class="hud-item">LIVES <span id="catcher-lives">❤️❤️❤️</span></div>
         <div class="hud-item">BEST <span id="catcher-best">0</span></div>
       </div>
+      <div class="catcher-picker-wrap">
+        <div class="catcher-picker-label">PICK YOUR CATCHER:</div>
+        <div class="catcher-picker" id="catcher-picker"></div>
+      </div>
       <div id="catcher-wrap">
         <canvas id="catcher-canvas" width="400" height="520"></canvas>
         <div class="game-message" id="catcher-message">
@@ -937,6 +1000,9 @@
     face: 'happy'
   };
 
+  // Forward ref so customizer changes can refresh the catcher picker thumbnails
+  let renderCatcherPicker = () => {};
+
   function render() {
     document.getElementById('torso').setAttribute('fill', COLORS[state.torso]);
     document.getElementById('arm-left').setAttribute('fill', COLORS[state.torso]);
@@ -947,6 +1013,7 @@
     document.getElementById('face-group').innerHTML = FACES[state.face];
     updateActive();
     localStorage.setItem('eddie-minifig', JSON.stringify(state));
+    renderCatcherPicker();
   }
 
   function updateActive() {
@@ -1097,6 +1164,7 @@
         const updated = loadCollection().filter((_, i) => i !== idx);
         saveCollection(updated);
         renderGallery();
+        renderCatcherPicker();
       });
       galleryGrid.appendChild(card);
     });
@@ -1113,6 +1181,7 @@
     col.push({ name: name.slice(0, 24), state: { ...state } });
     saveCollection(col);
     renderGallery();
+    renderCatcherPicker();
   });
 
   renderGallery();
@@ -1340,20 +1409,86 @@
   let bestCatcher = parseInt(localStorage.getItem('eddie-catcher-best') || '0', 10);
   cBestEl.textContent = bestCatcher;
 
+  let selectedCatcherIdx = -1; // -1 = current customizer state
+  let catcherActiveState = null; // frozen snapshot used during gameplay
+  let catcherDead = false;
+  let catcherExplosionPieces = [];
+  const EXPLOSION_COLORS = ['#FFCD00', '#E3000B', '#0058A3', '#00852B', '#FF7F00', '#7B2CBF', '#FF1493'];
+
+  function getSelectedCatcherState() {
+    if (selectedCatcherIdx === -1) return state;
+    const col = loadCollection();
+    return (col[selectedCatcherIdx] && col[selectedCatcherIdx].state) || state;
+  }
+
   function rebuildCatcherImage() {
     if (catcherImgUrl) URL.revokeObjectURL(catcherImgUrl);
-    const svgString = `<?xml version="1.0" encoding="UTF-8"?>` + minifigPreviewSVG(state);
+    const stateForImg = catcherActiveState || getSelectedCatcherState();
+    const svgString = `<?xml version="1.0" encoding="UTF-8"?>` + minifigPreviewSVG(stateForImg);
     const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
     catcherImgUrl = URL.createObjectURL(blob);
     const img = new Image();
     img.onload = () => { catcherImage = img; };
     img.src = catcherImgUrl;
   }
+
+  renderCatcherPicker = function() {
+    const picker = document.getElementById('catcher-picker');
+    if (!picker) return;
+    const col = loadCollection();
+    if (selectedCatcherIdx >= col.length) selectedCatcherIdx = -1;
+    picker.innerHTML = '';
+
+    const currentOpt = document.createElement('div');
+    currentOpt.className = 'catcher-option' + (selectedCatcherIdx === -1 ? ' active' : '');
+    currentOpt.innerHTML = minifigPreviewSVG(state) + '<div class="label">Current</div>';
+    currentOpt.addEventListener('click', () => {
+      selectedCatcherIdx = -1;
+      renderCatcherPicker();
+      if (!catcherRunning) rebuildCatcherImage();
+    });
+    picker.appendChild(currentOpt);
+
+    col.forEach((entry, idx) => {
+      const opt = document.createElement('div');
+      opt.className = 'catcher-option' + (selectedCatcherIdx === idx ? ' active' : '');
+      opt.innerHTML = minifigPreviewSVG(entry.state) + `<div class="label">${escapeHTML(entry.name)}</div>`;
+      opt.addEventListener('click', () => {
+        selectedCatcherIdx = idx;
+        renderCatcherPicker();
+        if (!catcherRunning) rebuildCatcherImage();
+      });
+      picker.appendChild(opt);
+    });
+  };
+  renderCatcherPicker();
   rebuildCatcherImage();
 
+  function spawnCatcherExplosion(cx, cy) {
+    for (let i = 0; i < 42; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 4 + Math.random() * 7;
+      catcherExplosionPieces.push({
+        x: cx + (Math.random() - 0.5) * 30,
+        y: cy + (Math.random() - 0.5) * 70,
+        w: 8 + Math.random() * 14,
+        h: 6 + Math.random() * 8,
+        color: EXPLOSION_COLORS[Math.floor(Math.random() * EXPLOSION_COLORS.length)],
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 7,
+        rot: Math.random() * Math.PI,
+        vrot: (Math.random() - 0.5) * 0.4,
+        life: 1
+      });
+    }
+  }
+
   function startCatcher() {
+    catcherActiveState = JSON.parse(JSON.stringify(getSelectedCatcherState()));
     rebuildCatcherImage();
     fallingBricks = [];
+    catcherExplosionPieces = [];
+    catcherDead = false;
     catcherScore = 0;
     catcherLives = 3;
     catcherX = catcherTargetX = CW / 2;
@@ -1367,16 +1502,16 @@
 
   function spawnCatcherBrick() {
     const elapsed = (performance.now() - catcherStartTime) / 1000;
-    const lavaRate = Math.min(0.12 + elapsed * 0.004, 0.28);
+    const lavaRate = Math.min(0.14 + elapsed * 0.0045, 0.30);
     let type;
     if (Math.random() < lavaRate) {
       type = { color: 'lava', points: -1 };
     } else {
       const r = Math.random();
-      if (r < 0.5) type = { color: ['#E3000B','#0058A3','#00852B'][Math.floor(Math.random() * 3)], points: 1 };
-      else if (r < 0.75) type = { color: '#FF7F00', points: 2 };
-      else if (r < 0.88) type = { color: '#7B2CBF', points: 3 };
-      else if (r < 0.97) type = { color: '#FFCD00', points: 5 };
+      if (r < 0.30) type = { color: ['#E3000B','#0058A3','#00852B'][Math.floor(Math.random() * 3)], points: 1 };
+      else if (r < 0.72) type = { color: '#FF7F00', points: 2 };
+      else if (r < 0.86) type = { color: '#7B2CBF', points: 3 };
+      else if (r < 0.96) type = { color: '#FFCD00', points: 5 };
       else type = { color: '#FF1493', points: 10 };
     }
     const w = 54;
@@ -1392,20 +1527,30 @@
 
   function drawCatcherBrick(b) {
     if (b.type.color === 'lava') {
-      const pulse = 0.7 + 0.3 * Math.sin(performance.now() / 120);
-      cCtx.fillStyle = `rgb(${Math.round(220 * pulse + 35)}, ${Math.round(60 * pulse + 30)}, 0)`;
-      cCtx.strokeStyle = '#3a1500';
+      // Disguised as an orange brick with a subtle red-orange pulse.
+      const pulse = (Math.sin(performance.now() / 380) + 1) / 2;
+      const g = Math.round(127 - pulse * 55);
+      const bl = Math.round(pulse * 8);
+      const colorStr = `rgb(255, ${g}, ${bl})`;
+      cCtx.fillStyle = colorStr;
+      cCtx.strokeStyle = '#000';
       cCtx.lineWidth = 2;
-      roundRect(cCtx, b.x, b.y, b.w, b.h, 5);
+      roundRect(cCtx, b.x, b.y, b.w, b.h, 4);
       cCtx.fill();
       cCtx.stroke();
-      cCtx.fillStyle = `rgba(255, 220, 80, ${0.4 + 0.3 * pulse})`;
-      roundRect(cCtx, b.x + 4, b.y + 4, b.w - 8, b.h - 8, 3);
-      cCtx.fill();
-      cCtx.font = 'bold 22px sans-serif';
-      cCtx.textAlign = 'center';
-      cCtx.textBaseline = 'middle';
-      cCtx.fillText('🔥', b.x + b.w / 2, b.y + b.h / 2 + 1);
+      cCtx.fillStyle = 'rgba(255,255,255,0.3)';
+      cCtx.fillRect(b.x + 2, b.y + 2, b.w - 4, 5);
+      cCtx.fillStyle = 'rgba(0,0,0,0.28)';
+      cCtx.fillRect(b.x + 2, b.y + b.h - 7, b.w - 4, 5);
+      const lavaStuds = 2;
+      cCtx.fillStyle = colorStr;
+      for (let i = 0; i < lavaStuds; i++) {
+        const sx = b.x + (i + 0.5) * (b.w / lavaStuds);
+        cCtx.beginPath();
+        cCtx.arc(sx, b.y - 1, 5, 0, Math.PI * 2);
+        cCtx.fill();
+        cCtx.stroke();
+      }
       return;
     }
     cCtx.fillStyle = b.type.color;
@@ -1514,6 +1659,7 @@
         b.y += b.vy;
         // caught if brick bottom enters catch band and horizontally overlaps
         if (
+          !catcherDead &&
           b.y + b.h >= catchTop &&
           b.y <= catchTop + 30 &&
           b.x + b.w >= catchLeft &&
@@ -1524,10 +1670,20 @@
             catcherFlash = 1;
             popText(b.x + b.w / 2, b.y, '-1 ♥', '#ff4444');
             updateCatcherHUD();
-            if (catcherLives <= 0) { fallingBricks.splice(i, 1); endCatcher(); continue; }
+            if (catcherLives <= 0) {
+              fallingBricks.splice(i, 1);
+              spawnCatcherExplosion(catcherX, CATCHER_Y_TOP + CATCHER_IMG_H / 2);
+              catcherDead = true;
+              catcherFlash = 1;
+              setTimeout(() => { endCatcher(); }, 1400);
+              continue;
+            }
           } else {
-            catcherScore += b.type.points;
-            popText(b.x + b.w / 2, b.y, '+' + b.type.points, '#FFCD00');
+            const shirtHex = catcherActiveState ? COLORS[catcherActiveState.torso] : null;
+            const bonus = (shirtHex && shirtHex === b.type.color) ? 2 : 1;
+            const pts = b.type.points * bonus;
+            catcherScore += pts;
+            popText(b.x + b.w / 2, b.y, bonus === 2 ? `+${pts} 2x!` : `+${pts}`, bonus === 2 ? '#FF1493' : '#FFCD00');
             updateCatcherHUD();
           }
           fallingBricks.splice(i, 1);
@@ -1551,11 +1707,34 @@
       }
     });
 
-    // draw catcher minifig
-    if (catcherImage && catcherImage.complete && catcherImage.naturalWidth > 0) {
+    // update + draw explosion pieces
+    for (let i = catcherExplosionPieces.length - 1; i >= 0; i--) {
+      const p = catcherExplosionPieces[i];
+      p.vy += 0.5;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vrot;
+      p.life -= 0.012;
+      if (p.life <= 0 || p.y > CH + 100) { catcherExplosionPieces.splice(i, 1); continue; }
+      cCtx.save();
+      cCtx.translate(p.x, p.y);
+      cCtx.rotate(p.rot);
+      cCtx.globalAlpha = Math.min(1, p.life);
+      cCtx.fillStyle = p.color;
+      cCtx.strokeStyle = '#000';
+      cCtx.lineWidth = 1.5;
+      roundRect(cCtx, -p.w / 2, -p.h / 2, p.w, p.h, 2);
+      cCtx.fill();
+      cCtx.stroke();
+      cCtx.restore();
+    }
+    cCtx.globalAlpha = 1;
+
+    // draw catcher minifig (hide when dead)
+    if (!catcherDead && catcherImage && catcherImage.complete && catcherImage.naturalWidth > 0) {
       cCtx.drawImage(catcherImage, catcherX - CATCHER_IMG_W / 2, CATCHER_Y_TOP, CATCHER_IMG_W, CATCHER_IMG_H);
-    } else {
-      // fallback box
+    } else if (!catcherDead) {
+      // fallback box while image loads
       cCtx.fillStyle = '#FFCD00';
       cCtx.fillRect(catcherX - 30, CATCHER_Y_TOP + 30, 60, 70);
     }
@@ -1612,7 +1791,8 @@
     "A single 2x4 LEGO brick can support up to 950 pounds of weight before breaking.",
     "LEGO minifigures were invented in 1978, and their smile has barely changed since.",
     "The Star Wars Millennium Falcon LEGO set has 7,541 pieces — one of the biggest ever!",
-    "LEGO bricks made today still fit perfectly with bricks made in 1958."
+    "LEGO bricks made today still fit perfectly with bricks made in 1958.",
+    "Eddie is handsome, and you know it. 😎"
   ];
 
   let factIndex = Math.floor(Math.random() * FACTS.length);
