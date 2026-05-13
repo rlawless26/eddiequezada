@@ -59,7 +59,7 @@
 
   .brick-title {
     font-family: 'Bangers', cursive;
-    font-size: clamp(1.2rem, 4.6vw, 5rem);
+    font-size: clamp(1.4rem, 5.5vw, 6rem);
     line-height: 1;
     text-align: center;
     letter-spacing: 0.02em;
@@ -1527,11 +1527,12 @@
 
   function drawCatcherBrick(b) {
     if (b.type.color === 'lava') {
-      // Disguised as an orange brick with a subtle red-orange pulse.
-      const pulse = (Math.sin(performance.now() / 380) + 1) / 2;
-      const g = Math.round(127 - pulse * 55);
-      const bl = Math.round(pulse * 8);
-      const colorStr = `rgb(255, ${g}, ${bl})`;
+      // Disguised as an orange brick but pulses into a red-hot tone.
+      const pulse = (Math.sin(performance.now() / 180) + 1) / 2;
+      const r = Math.round(255 - pulse * 30);
+      const g = Math.round(127 - pulse * 95);
+      const bl = Math.round(pulse * 6);
+      const colorStr = `rgb(${r}, ${g}, ${bl})`;
       cCtx.fillStyle = colorStr;
       cCtx.strokeStyle = '#000';
       cCtx.lineWidth = 2;
@@ -1542,14 +1543,39 @@
       cCtx.fillRect(b.x + 2, b.y + 2, b.w - 4, 5);
       cCtx.fillStyle = 'rgba(0,0,0,0.28)';
       cCtx.fillRect(b.x + 2, b.y + b.h - 7, b.w - 4, 5);
-      const lavaStuds = 2;
-      cCtx.fillStyle = colorStr;
-      for (let i = 0; i < lavaStuds; i++) {
-        const sx = b.x + (i + 0.5) * (b.w / lavaStuds);
+      // Dancing flames along the top
+      const flameTime = performance.now() / 110;
+      const flameCount = 3;
+      for (let f = 0; f < flameCount; f++) {
+        const fx = b.x + (f + 0.5) * (b.w / flameCount);
+        const flicker = Math.sin(flameTime + f * 1.7);
+        const fh = 16 + flicker * 3;
+        const fw = 9;
+        const tipX = fx + flicker * 1.6;
+        // Outer red flame
+        cCtx.fillStyle = 'rgba(220, 30, 0, 0.95)';
         cCtx.beginPath();
-        cCtx.arc(sx, b.y - 1, 5, 0, Math.PI * 2);
+        cCtx.moveTo(fx - fw / 2, b.y);
+        cCtx.quadraticCurveTo(fx - fw / 2 - 1, b.y - fh * 0.5, tipX, b.y - fh);
+        cCtx.quadraticCurveTo(fx + fw / 2 + 1, b.y - fh * 0.5, fx + fw / 2, b.y);
+        cCtx.closePath();
         cCtx.fill();
-        cCtx.stroke();
+        // Mid orange flame
+        cCtx.fillStyle = 'rgba(255, 140, 0, 0.95)';
+        cCtx.beginPath();
+        cCtx.moveTo(fx - fw / 3, b.y);
+        cCtx.quadraticCurveTo(fx - fw / 4, b.y - fh * 0.4, tipX, b.y - fh * 0.75);
+        cCtx.quadraticCurveTo(fx + fw / 4, b.y - fh * 0.4, fx + fw / 3, b.y);
+        cCtx.closePath();
+        cCtx.fill();
+        // Inner yellow flame
+        cCtx.fillStyle = 'rgba(255, 230, 80, 0.9)';
+        cCtx.beginPath();
+        cCtx.moveTo(fx - fw / 5, b.y);
+        cCtx.quadraticCurveTo(fx, b.y - fh * 0.25, tipX, b.y - fh * 0.5);
+        cCtx.quadraticCurveTo(fx + fw / 5, b.y - fh * 0.25, fx + fw / 5, b.y);
+        cCtx.closePath();
+        cCtx.fill();
       }
       return;
     }
